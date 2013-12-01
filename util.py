@@ -8,6 +8,21 @@ Created on Nov 30, 2013
 import numpy as np
 from datetime import datetime
 
+mandatory_fields = """x
+y
+name
+key
+url
+description
+x_type
+y_type
+preprocessing
+""".split('\n')
+
+def check_dict(d):
+    for attr in mandatory_fields:
+        val = d[attr]
+
 def load_file(name,**kwargs):
     a = np.loadtxt(name, dtype=np.str, **kwargs)
             
