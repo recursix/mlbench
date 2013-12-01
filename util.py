@@ -18,9 +18,15 @@ x_type
 y_type
 preprocessing""".split('\n')
 
+from graalUtil.num import uHist
 def check_dict(d):
     for attr in mandatory_fields:
         val = d[attr]
+    for key in ['x','y']:
+        print uHist( d[key],key)
+
+def split_xy(xy):
+    return xy[:,:-1], xy[:,-1]
 
 def load_file(name,**kwargs):
     a = np.loadtxt(name, dtype=np.str, **kwargs)
@@ -32,9 +38,7 @@ def load_file(name,**kwargs):
         col_[ col == '?' ] = 'NaN'
         xy[:,i] = col_.astype(np.float)
     
-    x = xy[:,:-1]
-    y = xy[:,-1]
-    return x,y
+    return split_xy(xy)
 
 def convert_date(date):
     dt=datetime.strptime("1/31/1998","%m/%d/%Y")
