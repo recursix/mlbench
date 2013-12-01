@@ -16,8 +16,7 @@ url
 description
 x_type
 y_type
-preprocessing
-""".split('\n')
+preprocessing""".split('\n')
 
 def check_dict(d):
     for attr in mandatory_fields:
