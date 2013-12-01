@@ -22,9 +22,9 @@ info = {
 }
 
 
-def convert(in_dir="raw", out_dir="."):
-    train_array = np.loadtxt(os.path.join(in_dir, train_file), delimiter=",", dtype=int)
-    test_array = np.loadtxt(os.path.join(in_dir, test_file), delimiter=",", dtype=int)
+def convert(raw_dir="raw"):
+    train_array = np.loadtxt(os.path.join(raw_dir, train_file), delimiter=",", dtype=int)
+    test_array = np.loadtxt(os.path.join(raw_dir, test_file), delimiter=",", dtype=int)
 
     train_x = train_array[:, :-1]
     train_y = train_array[:, -1]
@@ -38,8 +38,5 @@ def convert(in_dir="raw", out_dir="."):
     output_dict["test_indices"] = range(len(train_array), len(train_array) + len(test_array))
     output_dict["key"] = os.path.split(os.getcwd())[-1]
 
-    pickle.dump(output_dict, open(os.path.join(out_dir, "data.pkl"), "wb"))
+    return output_dict
 
-
-if __name__ == "__main__":
-    convert()
