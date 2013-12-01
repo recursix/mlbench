@@ -11,3 +11,11 @@ info = {
     "x_type":"reals",
     "y_type":"classification",
 }
+
+
+def convert(path="."):
+    pass
+
+if __name__ == "__main__":
+    convert()
+    
