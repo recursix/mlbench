@@ -1,2 +1,6 @@
 raw
 *.pyc
+.project
+.settings
+.pydevproject
+
