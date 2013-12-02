@@ -7,6 +7,7 @@ Created on Dec 2, 2013
 from importlib import import_module
 from os import path
 import os
+import util
 
 def convert( dataset_key_list ):
     for dataset_key in dataset_key_list:
@@ -17,6 +18,10 @@ def convert( dataset_key_list ):
         module.fetch(raw_dir)
         dataset_dict = module.convert(raw_dir)
         print dataset_dict.keys()
-        
-        
-convert( ['annealing' ])
+        util.check_dict(dataset_dict)
+        print 'x.shape = ', dataset_dict['x'].shape
+        print 'y.shape = ', dataset_dict['y'].shape
+
+
+if __name__ == "__main__":
+    convert( ['annealing' ])

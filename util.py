@@ -38,7 +38,7 @@ def wget(url, raw_dir):
     
 
 def convert_uci_classif( x_type, y_type, raw_dir, file_name, delimiter=",", **kwargs ):
-    type_list = x_type + [y_type]
+    type_list = x_type + (y_type,)
     xy = converter( type_list, path.join( raw_dir, file_name), delimiter=delimiter, **kwargs )
     return split_xy(xy)
     
@@ -56,10 +56,10 @@ def converter(type_list, file_path, delimiter=",", **kwargs):
         col_[ col == '?' ] = 'NaN'
         if type_ == 'enum':
             enum_map = build_enum_map(col_)
-            print 'column %2d:'%i, type_, enum_map
+#            print 'column %2d:'%i, type_, enum_map
             xy[:,i] = map(enum_map.get, col_ )
         elif type_ in ['float', 'int']:
-            print i, type_
+#            print i, type_
             xy[:,i] = col_.astype(np.float)
         else:
             raise ValueError('Unkown type : %s'%type_)
@@ -92,5 +92,5 @@ def load_file(name,**kwargs):
     return split_xy(xy)
 
 def convert_date(date):
-    dt=datetime.strptime("1/31/1998","%m/%d/%Y")
+    dt=datetime.strptime(date,"%m/%d/%Y")
     return float( dt.strftime("%s") )

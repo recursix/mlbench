@@ -13,6 +13,8 @@ info = {
     "name": "Annealing", # full name of the dataset
     "key":"annealing", # short name of the dataset, complying with mudule naming in python (the name of the current module should be <key>.py)
     "y_type":"enum", # the type of the y space. (will be enum for now) 
+    "x_type":None, # x_type can be complex see below 
+    "preprocessing": "", # breifly describes how the original dataset was transformed 
 }
 
 src_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/annealing/" 
@@ -21,12 +23,14 @@ def fetch(raw_dir): # takes care of fetching all required files into raw_dir
     util.wget("%s/anneal.data"%src_url, raw_dir) 
     
 
-info['preprocessing'] = "" # breifly describes how the original dataset was transformed
-
+# for now, the x_type is a tuple of primitives, taking values from "float", "int" and "enum"
+# Using python objects would allow a rich way of defining x_type but it would be hard to be compatible
+# with some storing formats.
+# I would like to be able to include more complex types such as array, image, sound, text but I'm not sure about the details yet
 x_type = ['enum']*38
 for i in [3,4,8,32,33,34]:
     x_type[i] = 'float'
-info['x_type'] = x_type
+info['x_type'] = tuple(x_type)
 
 
 def convert(raw_dir="raw"):
