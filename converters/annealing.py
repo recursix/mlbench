@@ -9,20 +9,31 @@ Created on Dec 1, 2013
 from mlbench import util
 
 info = {
-    "url" : "http://archive.ics.uci.edu/ml/datasets/Annealing",
-    "name": "Annealing",
-    "y_type":"enum",
-    "key":"annealing",
+    "url" : "http://archive.ics.uci.edu/ml/datasets/Annealing", # url of a web page for the dataset
+    "name": "Annealing", # full name of the dataset
+    "key":"annealing", # short name of the dataset, complying with mudule naming in python (the name of the current module should be <key>.py)
+    "y_type":"enum", # the type of the y space. (will be enum for now) 
 }
 
-info['preprocessing'] = ""
+src_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/annealing/" 
+
+def fetch(raw_dir): # takes care of fetching all required files into raw_dir
+    util.wget("%s/anneal.data"%src_url, raw_dir) 
+    
+
+info['preprocessing'] = "" # breifly describes how the original dataset was transformed
 
 x_type = ['enum']*38
 for i in [3,4,8,32,33,34]:
     x_type[i] = 'float'
 info['x_type'] = x_type
 
+
 def convert(raw_dir="raw"):
+    """
+    returns a dictionary containing the required fields for the dataset.
+    """
+    
     info['x'], info['y'] = util.convert_uci_classif(
         info['x_type'], info['y_type'], raw_dir,'anneal.data') 
     
@@ -92,6 +103,3 @@ info["description"]= """
       'missing_values' (and so can be treated as legal discrete
       values rather than as showing the absence of a discrete value).
 """
-
-if __name__ == "__main__":
-    util.check_dict(convert())

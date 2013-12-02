@@ -8,8 +8,9 @@ Created on Nov 30, 2013
 import numpy as np
 from datetime import datetime
 from warnings import warn
-from graalUtil.num import uHist
+#from graalUtil.num import uHist
 from os import path
+import subprocess as sp
 
 mandatory_fields = """x
 y
@@ -25,14 +26,16 @@ preprocessing""".split('\n')
 def check_dict(d):
     for attr in mandatory_fields:
         val = d[attr]
-    for key in ['x','y']:
-        print uHist( d[key],key)
+#    for key in ['x','y']:
+#        print uHist( d[key],key)
 
 def split_xy(xy):
     return xy[:,:-1], xy[:,-1]
 
 
-
+def wget(url, raw_dir):
+    sp.check_call(['wget', url, '-P',raw_dir])
+    
 
 def convert_uci_classif( x_type, y_type, raw_dir, file_name, delimiter=",", **kwargs ):
     type_list = x_type + [y_type]
