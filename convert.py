@@ -16,7 +16,7 @@ def convert( dataset_key_list ):
         raw_dir = path.join('/tmp', dataset_key)
         if not path.exists(raw_dir): os.mkdir(raw_dir)
         module.fetch(raw_dir)
-        dataset_dict = module.convert(raw_dir)
+        dataset_dict = module.convert(raw_dir, 500)
         print dataset_dict.keys()
         util.check_dict(dataset_dict)
         print 'x.shape = ', dataset_dict['x'].shape

@@ -33,7 +33,7 @@ for i in [3,4,8,32,33,34]:
 info['x_type'] = tuple(x_type)
 
 
-def convert(raw_dir="raw"):
+def convert(raw_dir, max_features):
     """
     returns a dictionary containing the required fields for the dataset.
     """
