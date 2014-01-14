@@ -8,20 +8,85 @@ from importlib import import_module
 from os import path
 import os
 import util
+from graalUtil.num import uHist
+import json
+import cPickle
+import zlib
 
-def convert( dataset_key_list ):
+def write_json( data, *file_path ):
+    with open( path.join( *file_path ), 'w' ) as fd:
+        json.dump( data, fd, indent=4 ) 
+
+def write_pklz( obj, *file_path ):
+    data = zlib.compress( cPickle.dumps(obj,cPickle.HIGHEST_PROTOCOL) )
+    with open( path.join( *file_path ), 'w' ) as fd:
+        fd.write(data)
+
+def read_pklz( *file_path ):
+    with open( path.join(*file_path), 'r' ) as fd:
+        data = fd.read() 
+    return cPickle.loads(zlib.decompress( data ))
+
+def save_dataset( dataset, ds_dir ):
+    if not path.exists(ds_dir): os.makedirs( ds_dir )
+    
+    ds_info = {'n_samples':dataset['x'].shape[0]}
+    for key in dataset.iterkeys():
+        if key in ['x','y']: continue
+        ds_info[key]  = dataset[key]
+        
+    write_json(ds_info, ds_dir, 'dataset_info.json' )
+    write_pklz(dataset, ds_dir, 'dataset.pklz' ) 
+    
+    
+
+def convert( dataset_key_list, collection_dir=None ):
     for dataset_key in dataset_key_list:
+        
+        print 'Converting %s.'%dataset_key
+        
         module = import_module("converters.%s"%dataset_key)
         
         raw_dir = path.join('/tmp', dataset_key)
         if not path.exists(raw_dir): os.mkdir(raw_dir)
+        
+        print 'fetch dataset'
         module.fetch(raw_dir)
+        
+        print 'converting dataset'
         dataset_dict = module.convert(raw_dir, 500)
+        
         print dataset_dict.keys()
         util.check_dict(dataset_dict)
         print 'x.shape = ', dataset_dict['x'].shape
         print 'y.shape = ', dataset_dict['y'].shape
 
+        for i, col in enumerate( dataset_dict['x'].T ):
+            print uHist(col, 'col %d'%i)
+        
+        print uHist( dataset_dict['y'], 'y' )
+        print
+        
+        if collection_dir is not None:
+            ds_dir =path.join( collection_dir, dataset_key)
+            save_dataset(dataset_dict, ds_dir ) 
+            
+            
+
 
 if __name__ == "__main__":
-    convert( ['annealing' ])
+    collection_dir = path.expandvars( "$HOME/data/dataset_collection/classification" )
+    convert( [
+        'annealing',
+        'biodeg',
+        'chess_KRKPA7',
+        'connect_4',
+        'covtype',
+        'ml_prove',
+        'optdigits',
+        'ozone',
+        'spambase',
+        'statlog_satimage',
+        ], collection_dir )
+    
+    

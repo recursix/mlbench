@@ -18,15 +18,12 @@ info = {
 }
 
 src_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/annealing/" 
-
+file_name = 'anneal.data'
 def fetch(raw_dir): # takes care of fetching all required files into raw_dir
-    util.wget("%s/anneal.data"%src_url, raw_dir) 
+    util.fetch(raw_dir, src_url, file_name)
     
 
-# for now, the x_type is a tuple of primitives, taking values from "float", "int" and "enum"
-# Using python objects would allow a rich way of defining x_type but it would be hard to be compatible
-# with some storing formats.
-# I would like to be able to include more complex types such as array, image, sound, text but I'm not sure about the details yet
+# x_type is a tuple of primitives, taking values from "float", "int" and "enum". 
 x_type = ['enum']*38
 for i in [3,4,8,32,33,34]:
     x_type[i] = 'float'
@@ -39,7 +36,7 @@ def convert(raw_dir, max_features):
     """
     
     info['x'], info['y'] = util.convert_uci_classif(
-        info['x_type'], info['y_type'], raw_dir,'anneal.data') 
+        info['x_type'], info['y_type'], raw_dir,file_name) 
     
     return info
 

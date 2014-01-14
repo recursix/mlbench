@@ -6,36 +6,28 @@ Created on Nov 30, 2013
 '''
 
 
-import numpy as np
-from os import path
-#from graalUtil.num import uHist
+
 from mlbench import util
 
 info = {
-    "url" : "http://archive.ics.uci.edu/ml/datasets/Connect-4",
-    "name": "Connect-4",
-    "x_type":"reals",
-    "y_type":"classification",
-    "key":"connect_4",
+    "url" : "http://archive.ics.uci.edu/ml/datasets/Connect-4", # url of a web page for the dataset
+    "name": "Connect-4", # full name of the dataset
+    "key":"connect_4", # short name of the dataset, complying with mudule naming in python (the name of the current module should be <key>.py)
+    "y_type":"enum", # the type of the y space. (will be enum for now) 
+    "x_type": ('enum',)*42, # it also contains integers, but for simplicity, I've just put floats
+    "preprocessing": "", # breifly describes how the original dataset was transformed 
 }
 
-info['preprocessing'] = "converting o,b,x to 0,1,2 and loss, draw, win to 0,1,2"
+src_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/connect-4/" 
+file_name = "connect-4.data.Z"
+file_name_ = "connect-4.data"
+def fetch(raw_dir): # takes care of fetching all required files into raw_dir
+    util.fetch(raw_dir, src_url, file_name)
+    util.uncompress( raw_dir, file_name, file_name_ )
 
-
-        
-def convert(raw_dir="raw"):
-    str_mat = np.loadtxt(path.join(raw_dir,"connect-4.data"),delimiter=",",dtype=np.str)
-
-    str_mat[str_mat == 'o'] = 0
-    str_mat[str_mat == 'b'] = 1
-    str_mat[str_mat == 'x'] = 2
-    str_mat[str_mat == 'loss'] = 0
-    str_mat[str_mat == 'draw'] = 1
-    str_mat[str_mat == 'win'] = 2
-
-    xy = str_mat.astype(np.float)
-    
-    info['x'], info['y'] = util.split_xy(xy)
+def convert(raw_dir, max_features):
+    info['x'], info['y'] = util.convert_uci_classif(
+        info['x_type'], info['y_type'], raw_dir, file_name_) 
     
     return info
 

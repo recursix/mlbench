@@ -5,165 +5,98 @@ Created on Nov 30, 2013
 @author: alexandre
 '''
 
-from os import path
-#from graalUtil.num import uHist
-from mlbench.util import load_file, convert_date, check_dict
+from mlbench import util
 
 info = {
     "url" : "http://archive.ics.uci.edu/ml/datasets/Ozone+Level+Detection",
-    "name": "Ozone Level Detection",
-    "x_type":"reals",
-    "y_type":"classification",
     "key":"ozone",
+    "name": "Ozone Level Detection",
+    "y_type":"enum", # the type of the y space. (will be enum for now) 
+    "x_type": ('float',)*73, # it also contains integers, but for simplicity, I've just put floats
+    "preprocessing": "", # breifly describes how the original dataset was transformed 
 }
 
-info['preprocessing'] = "using eighthr.data (eight hour data) and ignoring onehr.data"
 
+src_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/ozone/" 
+file_name = "eighthr.data"
+def fetch(raw_dir): # takes care of fetching all required files into raw_dir
+    util.fetch(raw_dir, src_url, file_name)
 
-
-def convert(raw_dir="raw"):
-    x,y = load_file(path.join(raw_dir,"eighthr.data"),delimiter=",",
-        converters={0:convert_date})
+def convert(raw_dir, max_features):
     
-    info['x'] = x[:,1:]
-    info['y'] = y
+    info['x'], info['y'] = util.convert_uci_classif(
+        info['x_type'], info['y_type'], raw_dir, file_name, converters={0:util.convert_date}) 
     
     return info
 
-
-
-
-
 info["description"]= """
-1. Title: Ozone Level Detection
+Source:
+
+Kun Zhang, zhang.kun05 '@' gmail.com, Department of Computer Science, Xavier University of Lousiana 
+Wei Fan, wei.fan '@' gmail.com, IBM T.J.Watson Research 
+XiaoJing Yuan, xyuan '@' uh.edu, Engineering Technology Department, College of Technology, University of Houston 
 
 
-2. Source:
+Data Set Information:
 
-Kun Zhang
-zhang.kun05 '@' gmail.com
-Department of Computer Science, 
-Xavier University of Lousiana
+For a list of attributes, please refer to those two .names files. They use the following naming convention: 
 
-Wei Fan
-wei.fan '@' gmail.com
-IBM T.J.Watson Research
+All the attribute start with T means the temperature measured at different time throughout the day; and those starts with WS indicate the wind speed at various time. 
 
-XiaoJing Yuan
-xyuan '@' uh.edu
-Engineering Technology Department, 
-College of Technology, University of Houston 
+WSR_PK: continuous. peek wind speed -- resultant (meaning average of wind vector) 
+
+WSR_AV: continuous. average wind speed 
+
+T_PK: continuous. Peak T 
+T_AV: continuous. Average T 
+T85: continuous. T at 850 hpa level (or about 1500 m height) 
+RH85: continuous. Relative Humidity at 850 hpa 
+U85: continuous. (U wind - east-west direction wind at 850 hpa) 
+V85: continuous. V wind - N-S direction wind at 850 
+HT85: continuous. Geopotential height at 850 hpa, it is about the same as height at low altitude 
+T70: continuous. T at 700 hpa level (roughly 3100 m height) 
+
+RH70: continuous. 
+U70: continuous. 
+V70: continuous. 
+HT70: continuous. 
+
+T50: continuous. T at 500 hpa level (roughly at 5500 m height) 
+
+RH50: continuous. 
+U50: continuous. 
+V50: continuous. 
+HT50: continuous. 
+
+KI: continuous. K-Index [Web Link] 
+TT: continuous. T-Totals [Web Link] 
+SLP: continuous. Sea level pressure 
+SLP_: continuous. SLP change from previous day 
+
+Precp: continuous. -- precipitation
 
 
-3. Past Usage:
+Attribute Information:
 
-Forecasting skewed biased stochastic ozone days: analyses, solutions and beyond, Knowledge and Information Systems, Vol. 14, No. 3, 2008.
-Discusses details about the dataset, its use as well as various experiments (both cross-validation and streaming) using many state-of-the-art methods.
+The following are specifications for several most important attributes that are highly valued by Texas Commission on Environmental Quality (TCEQ). More details can be found in the two relevant papers. 
 
-A shorter version of the paper (does not contain some detailed experiments as the journal paper above) is in:
+O 3 - Local ozone peak prediction 
+Upwind - Upwind ozone background level 
+EmFactor - Precursor emissions related factor 
+Tmax - Maximum temperature in degrees F 
+Tb - Base temperature where net ozone production begins (50 F) 
+SRd - Solar radiation total for the day 
+WSa - Wind speed near sunrise (using 09-12 UTC forecast mode) 
+WSp - Wind speed mid-day (using 15-21 UTC forecast mode) 
+
+Please refer to those two .names files.
+
+
+Relevant Papers:
+
+Forecasting skewed biased stochastic ozone days: analyses, solutions and beyond, Knowledge and Information Systems, Vol. 14, No. 3, 2008. 
+Discusses details about the dataset, its use as well as various experiments (both cross-validation and streaming) using many state-of-the-art methods. 
+A shorter version of the paper (does not contain some detailed experiments as the journal paper above) is in: 
 Forecasting Skewed Biased Stochastic Ozone Days: Analyses and Solutions. ICDM 2006: 753-764 
-
-
-4. Relevant Information:
-
-The following are specifications for several most important attributes 
-that are highly valued by Texas Commission on Environmental Quality (TCEQ). 
-More details can be found in the two relevant papers.
- 
--- O 3 - Local ozone peak prediction
--- Upwind - Upwind ozone background level
--- EmFactor - Precursor emissions related factor
--- Tmax - Maximum temperature in degrees F
--- Tb - Base temperature where net ozone production begins (50 F)
--- SRd - Solar radiation total for the day
--- WSa - Wind speed near sunrise (using 09-12 UTC forecast mode)
--- WSp - Wind speed mid-day (using 15-21 UTC forecast mode) 
-
-
-5. Number of Instances: 2536
-
-
-6. Number of Attributes: 73
-
-
-7. Attribute Information:
-
-1,0 | two classes 1: ozone day, 0: normal day
-
-Date:     ignore.
-WSR0:     continuous.
-WSR1:     continuous.
-WSR2:     continuous.
-WSR3:     continuous.
-WSR4:     continuous.
-WSR5:     continuous.
-WSR6:     continuous.
-WSR7:     continuous.
-WSR8:     continuous.
-WSR9:     continuous.
-WSR10:     continuous.
-WSR11:     continuous.
-WSR12:     continuous.
-WSR13:     continuous.
-WSR14:     continuous.
-WSR15:     continuous.
-WSR16:     continuous.
-WSR17:     continuous.
-WSR18:     continuous.
-WSR19:     continuous.
-WSR20:     continuous.
-WSR21:     continuous.
-WSR22:     continuous.
-WSR23:     continuous.
-WSR_PK:     continuous.
-WSR_AV:     continuous.
-T0:     continuous.
-T1:     continuous.
-T2:     continuous.
-T3:     continuous.
-T4:     continuous.
-T5:     continuous.
-T6:     continuous.
-T7:     continuous.
-T8:     continuous.
-T9:     continuous.
-T10:     continuous.
-T11:     continuous.
-T12:     continuous.
-T13:     continuous.
-T14:     continuous.
-T15:     continuous.
-T16:     continuous.
-T17:     continuous.
-T18:     continuous.
-T19:     continuous.
-T20:     continuous.
-T21:     continuous.
-T22:     continuous.
-T23:     continuous.
-T_PK:     continuous.
-T_AV:     continuous.
-T85:     continuous.
-RH85:     continuous.
-U85:     continuous.
-V85:     continuous.
-HT85:     continuous.
-T70:     continuous.
-RH70:     continuous.
-U70:     continuous.
-V70:     continuous.
-HT70:     continuous.
-T50:     continuous.
-RH50:     continuous.
-U50:     continuous.
-V50:     continuous.
-HT50:     continuous.
-KI:     continuous.
-TT:     continuous.
-SLP:     continuous.
-SLP_:     continuous.
-Precp:    continuous.
 """
 
-if __name__ == "__main__":
-    check_dict(convert())
