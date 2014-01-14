@@ -33,6 +33,31 @@ def check_dict(d):
 def split_xy(xy):
     return xy[:,:-1], xy[:,-1]
 
+def convert_value(str_val):
+    try:                return int(str_val)
+    except ValueError:  pass
+    try:                return float(str_val)
+    except ValueError:  pass
+    return str_val
+
+def infer_column_type( str_list ):
+    count = {
+        int : 0,
+        float : 0, 
+        str : 0,
+        "missing" : 0,
+        }
+    
+    for str_val in str_list:
+        if str_val == '?':
+            count['missing'] += 1
+        else:
+            val = convert_value(str_val)
+            count[type(val)] += 1
+
+    assert sum(count.values()) == len(str_list)
+    n = len(str_list) - count['missing']
+    
 
 def wget(url, raw_dir):
     sp.check_call(['wget', '-N', url, '-P',raw_dir])
@@ -46,7 +71,7 @@ def uncompress(raw_dir, src, dst ):
         sp.check_call(['gunzip', '-c', src ], cwd =raw_dir, stdout= fd )
 
 def untar( raw_dir, src ):
-    sp.check_call(['tar', '-xf', path.join(raw_dir, src) ])
+    sp.check_call(['tar', '-xf',  src ], cwd=raw_dir)
 
 def convert_uci_classif( x_type, y_type, raw_dir, file_name, delimiter=",", **kwargs ):
     type_list = x_type + (y_type,)
@@ -66,10 +91,8 @@ def converter(type_list, file_path, delimiter=",", **kwargs):
         col_[ col == '?' ] = 'NaN'
         if type_ == 'enum':
             enum_map = build_enum_map(col_)
-#            print 'column %2d:'%i, type_, enum_map
             xy[:,i] = map(enum_map.get, col_ )
         elif type_ in ['float', 'int']:
-#            print i, type_
             xy[:,i] = col_.astype(np.float)
         else:
             raise ValueError('Unkown type : %s'%type_)

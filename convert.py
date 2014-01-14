@@ -62,7 +62,7 @@ def convert( dataset_key_list, collection_dir=None ):
         print 'y.shape = ', dataset_dict['y'].shape
 
         for i, col in enumerate( dataset_dict['x'].T ):
-            print uHist(col, 'col %d'%i)
+            print uHist(col, 'col %d (%s)'%(i,dataset_dict['x_type'][i]))
         
         print uHist( dataset_dict['y'], 'y' )
         print
@@ -77,16 +77,16 @@ def convert( dataset_key_list, collection_dir=None ):
 if __name__ == "__main__":
     collection_dir = path.expandvars( "$HOME/data/dataset_collection/classification" )
     convert( [
-        'annealing',
-        'biodeg',
-        'chess_KRKPA7',
-        'connect_4',
-        'covtype',
+#        'annealing',
+#        'biodeg',
+#        'chess_KRKPA7',
+#        'connect_4',
+#        'covtype',
         'ml_prove',
-        'optdigits',
-        'ozone',
-        'spambase',
-        'statlog_satimage',
+#        'optdigits',
+#        'ozone',
+#        'spambase',
+#        'statlog_satimage',
         ], collection_dir )
     
     
