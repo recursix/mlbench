@@ -11,9 +11,9 @@ from mlbench import util
 info = {
     "url" : "http://archive.ics.uci.edu/ml/datasets/Wall-Following+Robot+Navigation+Data",
     "name": "Wall-Following Robot Navigation Data",
-    "key": "robot",
+    "key": "wall-robot",
     "y_type": "enum",  # the type of the y space. (will be enum for now)
-    "x_type": ('float',)*24,
+    "x_type": None,  # If None, it will be inferred from the content of the column
     "preprocessing": 'Only take the first dataset, which contains the raw values of measurements.',  # briefly describes how the original dataset was transformed
 }
 
@@ -25,8 +25,7 @@ def fetch(raw_dir): # takes care of fetching all required files into raw_dir
     
 
 def convert(raw_dir, max_features):
-    info['x'], info['y'] = util.convert_uci_classif(info['x_type'], info['y_type'], raw_dir, file_name)
-    return info
+    return util.convert_uci_classif(info, raw_dir, file_name)
 
 
 info["description"] = """

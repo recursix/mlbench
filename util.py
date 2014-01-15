@@ -116,7 +116,7 @@ def uncompress(raw_dir, src, dst ):
 def untar( raw_dir, src ):
     sp.check_call(['tar', '-xf',  src ], cwd=raw_dir)
 
-def convert_uci_classif_( info, raw_dir, file_name_list, delimiter=",", **kwargs ):
+def convert_uci_classif( info, raw_dir, file_name_list, delimiter=",", **kwargs ):
     """
     Some form of universal UCI converter. 
     """
@@ -130,18 +130,6 @@ def convert_uci_classif_( info, raw_dir, file_name_list, delimiter=",", **kwargs
     info['x'], info['y'] = split_xy(xy)
     return info
     
-def convert_uci_classif(x_type, y_type, raw_dir, file_name_list, delimiter=",", **kwargs):
-    """
-    for backward compatibility
-    """
-    info = {
-        'x_type':x_type,
-        'y_type':y_type,
-        }
-    
-    info = convert_uci_classif_(info, raw_dir, file_name_list, delimiter=",", **kwargs)
-    return info['x'], info['y']
-
 def choose_type( type_, inferred_type, col ):
     if type_ is None:
         type_ = inferred_type[0]

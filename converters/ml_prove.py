@@ -30,7 +30,7 @@ def convert(raw_dir, max_features):
     """
     data_dir = os.path.join( raw_dir, 'ml-prove' )
     file_name_list = ['test.csv', 'validation.csv', 'train.csv' ]
-    return util.convert_uci_classif_( info, data_dir, file_name_list ) 
+    return util.convert_uci_classif( info, data_dir, file_name_list )
     
 
 
