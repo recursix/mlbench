@@ -15,7 +15,7 @@ info = {
     "key": "optdigits",
     "name": "Optical Recognition of Handwritten Digits Data Set",
     "y_type":"enum", # the type of the y space. (will be enum for now) 
-    "x_type": ('int',)*64, # it also contains integers, but for simplicity, I've just put floats
+    "x_type": ('int',)*64, 
     "preprocessing": ["Two versions of the dataset are provided. The preprocessed version is used."],
 }
 
