@@ -26,8 +26,16 @@ preprocessing""".split('\n')
 verbose = 1
 
 class DictToObj:
-    def __init__(self, **kwargs):
-        self.__dict__ = kwargs
+    """
+    Just a wrapper around dict to make it behave like an object.
+    >>> d = {'a':1,'b':3.0}
+    >>> obj = DictToObj(d)
+    >>> obj.a = 3
+    >>> print d['a']
+    3
+    """
+    def __init__(self, dict_):
+        self.__dict__ = dict_
 
 def check_dict(d):
     for attr in mandatory_fields:

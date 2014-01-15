@@ -55,7 +55,7 @@ def convert( dataset_key_list, collection_dir=None ):
         module = import_module("converters.%s"%dataset_key)
         
         raw_dir = path.join('/tmp/mlbench', dataset_key)
-        if not path.exists(raw_dir): os.mkdir(raw_dir)
+        if not path.exists(raw_dir): os.makedirs(raw_dir)
         
         print 'fetch dataset'
         module.fetch(raw_dir)
@@ -63,7 +63,7 @@ def convert( dataset_key_list, collection_dir=None ):
         print 'converting dataset'
         dataset_dict = module.convert(raw_dir, 500)
         util.check_dict(dataset_dict)
-        dataset = util.DictToObj( **dataset_dict ) # much easier to work with
+        dataset = util.DictToObj( dataset_dict ) # much easier to work with
 
         
         print 'x.shape = ', dataset.x.shape
