@@ -27,7 +27,7 @@ def convert(raw_dir, max_features):
     """
     returns a dictionary containing the required fields for the dataset.
     """
-    return util.convert_uci_classif_( info, raw_dir, file_name ) 
+    return util.convert_uci_classif( info, raw_dir, file_name )
     
 
 

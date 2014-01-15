@@ -39,10 +39,8 @@ def convert(raw_dir, max_features):
                 if len(line) > 0 and line[-1] != ',':
                     f_out.write('\n')
                 
-    info['x'], info['y'] = util.convert_uci_classif(
-        info['x_type'], info['y_type'], raw_dir,fixed_file_name) 
+    return util.convert_uci_classif(info, raw_dir, fixed_file_name)
     
-    return info
 
 info["description"]= """
 1. Title: Cylinder bands

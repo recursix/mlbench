@@ -13,14 +13,9 @@ info = {
     "name": "Census-Income (KDD)",
     "key": "census-income",
     "y_type": "enum",  # the type of the y space. (will be enum for now)
-    "x_type": ['enum',]*40,  # most features are nominal, but others not (see below)
+    "x_type": None,  # If None, it will be inferred from the content of the column
     "preprocessing": "Feature 24 (instance weight) has been deleted, as explained by authors. Original train/test is ignored, all data is merged.",  # briefly describes how the original dataset was transformed
 }
-
-for float_feature_index in [0, 5, 16, 17, 18, 29, 38]:
-    info["x_type"][float_feature_index] = "float"
-
-info["x_type"] = tuple(info["x_type"])
 
 src_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/census-income-mld"
 file_name = "census.tar.gz"
@@ -33,18 +28,11 @@ def fetch(raw_dir):  # takes care of fetching all required files into raw_dir
 def convert(raw_dir, max_features):
     util.untar(raw_dir, file_name)
 
-    data_list = []
-    for data_file_name in ["census-income.data", "census-income.data"]:
-        columns = range(24) + range(25, 42)
-        data_list.append(util.convert_uci_classif(info["x_type"], info["y_type"], raw_dir, data_file_name,
-                                                  delimiter=", ", usecols=columns))
+    file_name_list = ["census-income.data", "census-income.data"]
 
-    x_list, y_list = zip(*data_list)
-
-    info["x"] = np.vstack(x_list)
-    info["y"] = np.concatenate(y_list)
-
-    return info
+    # We remove feature 24 (instance weight).
+    columns = range(24) + range(25, 42)
+    return util.convert_uci_classif(info, raw_dir, file_name_list, delimiter=", ", usecols=columns)
 
 
 info["description"] = """
