@@ -14,6 +14,9 @@ import cPickle
 import zlib
 import sys
 
+
+        
+
 def write_json( data, *file_path ):
     with open( path.join( *file_path ), 'w' ) as fd:
         json.dump( data, fd, indent=4 ) 
@@ -39,7 +42,10 @@ def save_dataset( dataset, ds_dir ):
     write_json(ds_info, ds_dir, 'dataset_info.json' )
     write_pklz(dataset, ds_dir, 'dataset.pklz' ) 
     
-    
+def convert_missing( dataset ):
+    for col, type_ in enumerate( dataset['x'].T ):
+        pass
+    pass  
 
 def convert( dataset_key_list, collection_dir=None ):
     for dataset_key in dataset_key_list:
@@ -56,16 +62,17 @@ def convert( dataset_key_list, collection_dir=None ):
         
         print 'converting dataset'
         dataset_dict = module.convert(raw_dir, 500)
-        
-        print dataset_dict.keys()
         util.check_dict(dataset_dict)
-        print 'x.shape = ', dataset_dict['x'].shape
-        print 'y.shape = ', dataset_dict['y'].shape
+        dataset = util.DictToObj( **dataset_dict ) # much easier to work with
 
-        for i, col in enumerate( dataset_dict['x'].T ):
-            print uHist(col, 'col %d (%s)'%(i,dataset_dict['x_type'][i]))
         
-        print uHist( dataset_dict['y'], 'y' )
+        print 'x.shape = ', dataset.x.shape
+        print 'y.shape = ', dataset.y.shape
+
+        for i, col in enumerate( dataset.x.T ):
+            print uHist(col, 'col %d (%s)'%(i,dataset.x_type[i]))
+        
+        print uHist( dataset.y, 'y' )
         print
         
         if collection_dir is not None:

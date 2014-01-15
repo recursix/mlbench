@@ -25,6 +25,10 @@ preprocessing""".split('\n')
 
 verbose = 1
 
+class DictToObj:
+    def __init__(self, **kwargs):
+        self.__dict__ = kwargs
+
 def check_dict(d):
     for attr in mandatory_fields:
         val = d[attr]
