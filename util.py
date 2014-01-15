@@ -154,7 +154,6 @@ def choose_type( type_, inferred_type, col ):
     return type_
 
 def converter(x_type, y_type, path_list, delimiter=",", **kwargs):
-    print file_path
     str_mat_list = []
     for file_path in path_list:
         str_mat_list.append(  np.loadtxt(file_path, dtype=np.str,delimiter=delimiter,**kwargs) )
