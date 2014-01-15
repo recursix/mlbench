@@ -23,6 +23,7 @@ x_type
 y_type
 preprocessing""".split('\n')
 
+verbose = 1
 
 def check_dict(d):
     for attr in mandatory_fields:
@@ -34,13 +35,21 @@ def split_xy(xy):
     return xy[:,:-1], xy[:,-1]
 
 def convert_value(str_val):
+    """
+    Tries to convert to int, float or str and returns the first successful conversion.
+    """
     try:                return int(str_val)
     except ValueError:  pass
     try:                return float(str_val)
     except ValueError:  pass
-    return str_val
+    return str(str_val)
 
-def infer_column_type( str_list ):
+def infer_column_type( str_list, verbose ):
+    """
+    A set of rules to infer the type of a given feature among 'float', 'int', 'enum'.
+    It may return more than one type in case of ambiguity
+    """
+    
     count = {
         int : 0,
         float : 0, 
@@ -55,9 +64,43 @@ def infer_column_type( str_list ):
             val = convert_value(str_val)
             count[type(val)] += 1
 
+    unique = np.unique( str_list )
+    unique_ratio = len(unique) / float(len(str_list))
+    
+    if verbose:
+        if len(unique) <= 20:
+            print 'unique : ', unique
+        else: 
+            print 'unique : %d values'%len(unique)
+        print 'count : ', count
+    
     assert sum(count.values()) == len(str_list)
     n = len(str_list) - count['missing']
     
+    
+    if count[int] == n: # only ints. This can be an enum or an int type
+        
+        if len(unique) <= 2:
+            return 'enum','int' # highly likely to be an int
+        if unique_ratio > 0.5:
+            return 'int', # really unlikely to be an enum
+        
+        return 'int', 'enum' # can't distinguish between int or enum but int is more likely
+    
+    if count[float] + count[int] == n and count[float] > 0: 
+        return 'float',
+    
+    if count[str] == n: # definetly an enum
+        return 'enum',
+    
+    type_list = []
+    if count[str] > 0:
+        type_list.append( 'enum' )
+    if count[int] > 0 and count[str] == 0:
+        type_list.append( 'int' )
+    
+         
+    return tuple(type_list)
 
 def wget(url, raw_dir):
     sp.check_call(['wget', '-N', url, '-P',raw_dir])
@@ -73,20 +116,72 @@ def uncompress(raw_dir, src, dst ):
 def untar( raw_dir, src ):
     sp.check_call(['tar', '-xf',  src ], cwd=raw_dir)
 
-def convert_uci_classif( x_type, y_type, raw_dir, file_name, delimiter=",", **kwargs ):
-    type_list = x_type + (y_type,)
-    xy = converter( type_list, path.join( raw_dir, file_name), delimiter=delimiter, **kwargs )
-    return split_xy(xy)
-    
+def convert_uci_classif_( info, raw_dir, file_name_list, delimiter=",", **kwargs ):
+    """
+    Some form of universal UCI converter. 
+    """
 
-def converter(type_list, file_path, delimiter=",", **kwargs):
-    print file_path
-    a = np.loadtxt(file_path, dtype=np.str,delimiter=delimiter,**kwargs)
-    xy = np.empty(a.shape, dtype=np.float)
+    if isinstance( file_name_list, str ):
+        file_name_list = [file_name_list]
     
-    assert a.shape[1] == len(type_list),  'num col = %d, num type = %d'%( a.shape[1] , len(type_list) )
+    path_list = [ path.join( raw_dir, file_name ) for file_name in file_name_list ]
     
-    for i, (type_, col) in enumerate(zip(type_list,a.T)):
+    xy, info['x_type'] = converter(info['x_type'], info['y_type'], path_list, delimiter=delimiter, **kwargs ) 
+    info['x'], info['y'] = split_xy(xy)
+    return info
+    
+def convert_uci_classif(x_type, y_type, raw_dir, file_name_list, delimiter=",", **kwargs):
+    """
+    for backward compatibility
+    """
+    info = {
+        'x_type':x_type,
+        'y_type':y_type,
+        }
+    
+    info = convert_uci_classif_(info, raw_dir, file_name_list, delimiter=",", **kwargs)
+    return info['x'], info['y']
+
+def choose_type( type_, inferred_type, col ):
+    if type_ is None:
+        type_ = inferred_type[0]
+        if len(inferred_type) > 1:
+            print "***WARNING*** possible types for column %d are %s. Choosing %s"%(col, str(inferred_type), inferred_type[0] )
+    else:
+        if not type_ in inferred_type:
+            print "***WARNING*** type %s specified for column %d but possible types are %s"%(type_, col, str(inferred_type) )
+
+    return type_
+
+def converter(x_type, y_type, path_list, delimiter=",", **kwargs):
+    str_mat_list = []
+    for file_path in path_list:
+        str_mat_list.append(  np.loadtxt(file_path, dtype=np.str,delimiter=delimiter,**kwargs) )
+    str_mat = np.vstack(str_mat_list)
+    
+    
+    xy = np.empty(str_mat.shape, dtype=np.float)
+    
+    if x_type is None:
+        x_type = [None]* (str_mat.shape[1]-1)
+    else:
+        x_type = list(x_type)
+    
+    type_list = x_type[:] # copy 
+    type_list.append(y_type)
+
+    assert str_mat.shape[1] == len(type_list),  'num col = %d, num type = %d'%( str_mat.shape[1] , len(type_list) )
+    
+    for i, col in enumerate(str_mat.T):
+        verbose = type_list[i] is None
+
+        inferred_types = infer_column_type(col, verbose)
+        type_ = choose_type(type_list[i], inferred_types , i )
+        if verbose:
+            print 'type: proposed: %s, inferred: %s, chosen: %s'%( type_list[i], str(inferred_types), type_ )
+            print 
+        type_list[i] = type_
+
 
         col_ = col.copy()
         col_[ col == '?' ] = 'NaN'
@@ -97,7 +192,7 @@ def converter(type_list, file_path, delimiter=",", **kwargs):
             xy[:,i] = col_.astype(np.float)
         else:
             raise ValueError('Unkown type : %s'%type_)
-    return xy
+    return xy, type_list[:-1]
 
 def build_enum_map(col_str):
     """

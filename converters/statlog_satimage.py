@@ -7,14 +7,13 @@ Created on Nov 30, 2013
 
 
 from mlbench import util
-import numpy as np
 
 info = {
     "url": "http://archive.ics.uci.edu/ml/datasets/Statlog+%28Landsat+Satellite%29",
     "name": "Statlog (Landsat Satellite)",
     "key":"statlog_satimage",
     "y_type":"enum", # the type of the y space. (will be enum for now) 
-    "x_type": ('float',)*36, # it also contains integers, but for simplicity, I've just put floats
+    "x_type": ('int',)*36, 
     "preprocessing": "", # breifly describes how the original dataset was transformed 
 }
 
@@ -27,19 +26,14 @@ def fetch(raw_dir): # takes care of fetching all required files into raw_dir
         util.fetch(raw_dir, src_url, file_name)
     
 
+
+
 def convert(raw_dir, max_features):
-    data_list = []
-    for file_name in file_name_list:
-        data_list.append( util.convert_uci_classif( 
-            info['x_type'], info['y_type'], raw_dir, file_name, delimiter=' ') )
+    """
+    returns a dictionary containing the required fields for the dataset.
+    """
+    return util.convert_uci_classif_( info, raw_dir, file_name_list,  delimiter=' ' ) 
     
-    
-    x_list, y_list = zip( *data_list )
-    
-    info['x'] = np.vstack(x_list)
-    info['y'] = np.concatenate(y_list)
-    
-    return info
 
 
 info["description"]= """

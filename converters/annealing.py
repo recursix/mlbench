@@ -13,7 +13,7 @@ info = {
     "name": "Annealing", # full name of the dataset
     "key":"annealing", # short name of the dataset, complying with mudule naming in python (the name of the current module should be <key>.py)
     "y_type":"enum", # the type of the y space. (will be enum for now) 
-    "x_type":None, # x_type can be complex see below 
+    "x_type": None, # If None, it will be inferred from the content of the column
     "preprocessing": "", # breifly describes how the original dataset was transformed 
 }
 
@@ -23,22 +23,13 @@ def fetch(raw_dir): # takes care of fetching all required files into raw_dir
     util.fetch(raw_dir, src_url, file_name)
     
 
-# x_type is a tuple of primitives, taking values from "float", "int" and "enum". 
-x_type = ['enum']*38
-for i in [3,4,8,32,33,34]:
-    x_type[i] = 'float'
-info['x_type'] = tuple(x_type)
-
 
 def convert(raw_dir, max_features):
     """
     returns a dictionary containing the required fields for the dataset.
     """
+    return util.convert_uci_classif_( info, raw_dir, file_name ) 
     
-    info['x'], info['y'] = util.convert_uci_classif(
-        info['x_type'], info['y_type'], raw_dir,file_name) 
-    
-    return info
 
 info["description"]= """
 1. Title of Database: Annealing Data
