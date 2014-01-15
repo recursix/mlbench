@@ -16,7 +16,7 @@ info = {
     "key": "optdigits",
     "name": "Optical Recognition of Handwritten Digits Data Set",
     "y_type":"enum", # the type of the y space. (will be enum for now) 
-    "x_type": ('float',)*64, # it also contains integers, but for simplicity, I've just put floats
+    "x_type": ('int',)*64, # it also contains integers, but for simplicity, I've just put floats
     "preprocessing": ["Two versions of the dataset are provided. The preprocessed version is used."],
 }
 
@@ -28,18 +28,13 @@ def fetch(raw_dir): # takes care of fetching all required files into raw_dir
     for file_name in file_name_list:
         util.fetch(raw_dir, src_url, file_name)
 
+
 def convert(raw_dir, max_features):
+    """
+    returns a dictionary containing the required fields for the dataset.
+    """
+    return util.convert_uci_classif_( info, raw_dir, file_name_list ) 
     
-    data_list = []
-    for file_name in file_name_list:
-        data_list.append( util.convert_uci_classif( 
-            info['x_type'], info['y_type'], raw_dir, file_name) )
-    
-    x_list, y_list = zip( *data_list )
-    info['x'] = np.vstack(x_list)
-    info['y'] = np.concatenate(y_list)
-    
-    return info
 
 info["description"]= """
 Source:

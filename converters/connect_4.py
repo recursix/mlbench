@@ -14,7 +14,7 @@ info = {
     "name": "Connect-4", # full name of the dataset
     "key":"connect_4", # short name of the dataset, complying with mudule naming in python (the name of the current module should be <key>.py)
     "y_type":"enum", # the type of the y space. (will be enum for now) 
-    "x_type": ('enum',)*42, # it also contains integers, but for simplicity, I've just put floats
+    "x_type": None, # If None, it will be inferred from the content of the column
     "preprocessing": "", # breifly describes how the original dataset was transformed 
 }
 
@@ -26,10 +26,12 @@ def fetch(raw_dir): # takes care of fetching all required files into raw_dir
     util.uncompress( raw_dir, file_name, file_name_ )
 
 def convert(raw_dir, max_features):
-    info['x'], info['y'] = util.convert_uci_classif(
-        info['x_type'], info['y_type'], raw_dir, file_name_) 
+    """
+    returns a dictionary containing the required fields for the dataset.
+    """
+    return util.convert_uci_classif_( info, raw_dir, file_name_ ) 
     
-    return info
+
 
 info["description"]= """
 Data Set Information:

@@ -16,7 +16,7 @@ info = {
     "name": "Spambase",
     "key":"spambase",
     "y_type":"enum", # the type of the y space. (will be enum for now) 
-    "x_type": ('float',)*57, # it also contains integers, but for simplicity, I've just put floats
+    "x_type": None, # If None, it will be inferred from the content of the column
     "preprocessing": "", # breifly describes how the original dataset was transformed 
 }
 
@@ -27,10 +27,11 @@ def fetch(raw_dir): # takes care of fetching all required files into raw_dir
     
 
 def convert(raw_dir, max_features):
-    info['x'], info['y'] = util.convert_uci_classif(
-        info['x_type'], info['y_type'], raw_dir, file_name) 
+    """
+    returns a dictionary containing the required fields for the dataset.
+    """
+    return util.convert_uci_classif_( info, raw_dir, file_name ) 
     
-    return info
 
 
 info["description"]= """

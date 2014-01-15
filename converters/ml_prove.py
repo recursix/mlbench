@@ -8,14 +8,13 @@ Created on Dec 1, 2013
 
 from mlbench import util
 import os
-import numpy as np
 
 info = {
     "url" : "http://archive.ics.uci.edu/ml/datasets/First-order+theorem+proving#",
     "key":"ml_prove",
     "name": "First-order theorem proving",
     "y_type":"enum", # the type of the y space. (will be enum for now) 
-    "x_type": ('float',)*56, # it also contains integers, but for simplicity, I've just put floats
+    "x_type": None, # If None, it will be inferred from the content of the column
     "preprocessing": "", # breifly describes how the original dataset was transformed 
 }
 
@@ -26,21 +25,14 @@ def fetch(raw_dir): # takes care of fetching all required files into raw_dir
     util.untar(raw_dir, file_name )
 
 def convert(raw_dir, max_features):
-    
+    """
+    returns a dictionary containing the required fields for the dataset.
+    """
     data_dir = os.path.join( raw_dir, 'ml-prove' )
+    file_name_list = ['test.csv', 'validation.csv', 'train.csv' ]
+    return util.convert_uci_classif_( info, data_dir, file_name_list ) 
     
-    data_list = []
-    for file_name in ['test.csv', 'validation.csv', 'train.csv' ]:
-        data_list.append( util.convert_uci_classif( 
-            info['x_type'], info['y_type'], data_dir, file_name) )
-    
-    
-    x_list, y_list = zip( *data_list )
-    
-    info['x'] = np.vstack(x_list)
-    info['y'] = np.concatenate(y_list)
-    
-    return info
+
 
 info["description"]= """
 Source:
