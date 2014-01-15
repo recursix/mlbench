@@ -48,7 +48,7 @@ def convert( dataset_key_list, collection_dir=None ):
         
         module = import_module("converters.%s"%dataset_key)
         
-        raw_dir = path.join('/tmp', dataset_key)
+        raw_dir = path.join('/tmp/mlbench', dataset_key)
         if not path.exists(raw_dir): os.mkdir(raw_dir)
         
         print 'fetch dataset'
@@ -79,14 +79,17 @@ if __name__ == "__main__":
     dataset_list = [
         'annealing',
         'biodeg',
+        'census-income',
         'chess_KRKPA7',
         'connect_4',
         'covtype',
+        'cylinder_bands',
         'ml_prove',
         'optdigits',
         'ozone',
         'spambase',
         'statlog_satimage',
+        'wall-robot'
         ]
     
     collection_dir = path.expandvars( "$HOME/data/dataset_collection/classification" )
