@@ -80,6 +80,7 @@ def convert_uci_classif( x_type, y_type, raw_dir, file_name, delimiter=",", **kw
     
 
 def converter(type_list, file_path, delimiter=",", **kwargs):
+    print file_path
     a = np.loadtxt(file_path, dtype=np.str,delimiter=delimiter,**kwargs)
     xy = np.empty(a.shape, dtype=np.float)
     

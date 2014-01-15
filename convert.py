@@ -12,6 +12,7 @@ from graalUtil.num import uHist
 import json
 import cPickle
 import zlib
+import sys
 
 def write_json( data, *file_path ):
     with open( path.join( *file_path ), 'w' ) as fd:
@@ -75,18 +76,26 @@ def convert( dataset_key_list, collection_dir=None ):
 
 
 if __name__ == "__main__":
-    collection_dir = path.expandvars( "$HOME/data/dataset_collection/classification" )
-    convert( [
-#        'annealing',
-#        'biodeg',
-#        'chess_KRKPA7',
-#        'connect_4',
-#        'covtype',
+    dataset_list = [
+        'annealing',
+        'biodeg',
+        'chess_KRKPA7',
+        'connect_4',
+        'covtype',
         'ml_prove',
-#        'optdigits',
-#        'ozone',
-#        'spambase',
-#        'statlog_satimage',
-        ], collection_dir )
+        'optdigits',
+        'ozone',
+        'spambase',
+        'statlog_satimage',
+        ]
+    
+    collection_dir = path.expandvars( "$HOME/data/dataset_collection/classification" )
+
+    if len(sys.argv) > 1:
+        dataset_list = sys.argv[1].split(',')
+    if len(sys.argv) > 2:
+        collection_dir = sys.argv[2]
+    
+    convert(dataset_list, collection_dir)
     
     
