@@ -9,7 +9,6 @@ Created on Nov 30, 2013
 
 
 from mlbench import util
-import numpy as np
 
 info = {
     "url": "http://archive.ics.uci.edu/ml/datasets/Optical+Recognition+of+Handwritten+Digits",
