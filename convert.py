@@ -61,34 +61,41 @@ def convert_missing( dataset ):
                 default_val = np.mean(valid)  
                 dataset.x[missing,i] = default_val
  
- 
+def fetch_and_convert(dataset_key):
+    
+    print 'Converting %s.'%dataset_key
+        
+    module = import_module("converters.%s"%dataset_key)
+    
+    raw_dir = path.join('/tmp/mlbench', dataset_key)
+    if not path.exists(raw_dir): os.makedirs(raw_dir)
+    
+    print 'fetch dataset'
+    module.fetch(raw_dir)
+    
+    print 'converting dataset'
+    return module.convert(raw_dir, 500)
+    
+
+def analyze_dataset( dataset ):
+    print 'x.shape = ', dataset.x.shape
+    print 'y.shape = ', dataset.y.shape
+
+    for i, col in enumerate( dataset.x.T ):
+        print uHist(col, 'col %d (%s)'%(i,dataset.x_type[i]))
+    
+    print uHist( dataset.y, 'y' )
+    print
+
 def convert( dataset_key_list, collection_dir=None ):
     for dataset_key in dataset_key_list:
-        
-        print 'Converting %s.'%dataset_key
-        
-        module = import_module("converters.%s"%dataset_key)
-        
-        raw_dir = path.join('/tmp/mlbench', dataset_key)
-        if not path.exists(raw_dir): os.makedirs(raw_dir)
-        
-        print 'fetch dataset'
-        module.fetch(raw_dir)
-        
-        print 'converting dataset'
-        dataset_dict = module.convert(raw_dir, 500)
+        dataset_dict = fetch_and_convert(dataset_key)
+
         util.check_dict(dataset_dict)
         dataset = util.DictToObj( dataset_dict ) # much easier to work with
 
         
-        print 'x.shape = ', dataset.x.shape
-        print 'y.shape = ', dataset.y.shape
 
-        for i, col in enumerate( dataset.x.T ):
-            print uHist(col, 'col %d (%s)'%(i,dataset.x_type[i]))
-        
-        print uHist( dataset.y, 'y' )
-        print
         
         if collection_dir is not None:
             ds_dir =path.join( collection_dir, dataset_key)
