@@ -138,7 +138,7 @@ def untar( raw_dir, src ):
 def unzip(raw_dir, src):
     sp.check_call(['unzip', '-o', src], cwd=raw_dir)
 
-def convert_uci_classif( info, raw_dir, file_name_list, delimiter=",", y_first=False, **kwargs ):
+def convert_uci_classif( info, raw_dir, file_name_list, delimiter=",", y_first=False, stride=1, **kwargs ):
     """
     Some form of universal UCI converter. 
     """
@@ -148,7 +148,7 @@ def convert_uci_classif( info, raw_dir, file_name_list, delimiter=",", y_first=F
     
     path_list = [ path.join( raw_dir, file_name ) for file_name in file_name_list ]
     
-    xy, info['x_type'] = converter(info['x_type'], info['y_type'], path_list, delimiter=delimiter, y_first=y_first, **kwargs ) 
+    xy, info['x_type'] = converter(info['x_type'], info['y_type'], path_list, delimiter, y_first, stride, **kwargs ) 
     info['x'], info['y'] = split_xy(xy, y_first)
     return info
     
@@ -163,13 +163,16 @@ def choose_type( type_, inferred_type, col ):
 
     return type_
 
-def converter(x_type, y_type, path_list, delimiter=",", y_first=False, **kwargs):
+def converter(x_type, y_type, path_list, delimiter=",", y_first=False, stride=1, **kwargs):
     """
     y_first: True => first column contains labels; False => last column contains labels.
     """
     str_mat_list = []
     for file_path in path_list:
-        str_mat_list.append(  np.loadtxt(file_path, dtype=np.str,delimiter=delimiter,**kwargs) )
+        str_mat = np.loadtxt(file_path, dtype=np.str,delimiter=delimiter,**kwargs)
+        if stride > 1:
+            str_mat = str_mat[::stride,:]
+        str_mat_list.append( str_mat   )
     str_mat = np.vstack(str_mat_list)
     
     
@@ -191,13 +194,16 @@ def converter(x_type, y_type, path_list, delimiter=",", y_first=False, **kwargs)
     
     for i, col in enumerate(str_mat.T):
         verbose = type_list[i] is None
-
-        inferred_types = infer_column_type(col, verbose)
-        type_ = choose_type(type_list[i], inferred_types , i )
-        if verbose:
-            print 'type: proposed: %s, inferred: %s, chosen: %s'%( type_list[i], str(inferred_types), type_ )
-            print 
-        type_list[i] = type_
+        type_ =type_list[i]
+        
+        if type_ is None :
+            inferred_types = infer_column_type(col, verbose)
+            type_ = choose_type(type_, inferred_types , i )
+            type_list[i] = type_
+            if verbose:
+                print 'inferring type. Selecting %s from %s.'%( type_, str(inferred_types) )
+                print 
+                
 
         col[ col == '?' ] = 'NaN'
         if type_ == 'enum':

@@ -16,7 +16,7 @@ info = {
     "name": "PAMAP2 Physical Activity Monitoring",
     "key": "pamap2",
     "y_type": "enum",  # the type of the y space. (will be enum for now)
-    "x_type": None,  # If None, it will be inferred from the content of the column
+    "x_type": ('float',)*40,  # If None, it will be inferred from the content of the column
     "preprocessing": 'Timestamp and "invalid" (according to the authors) features are removed. Only "Protocol" data files are used: "Optional" ones only contain "other" class.',  # briefly describes how the original dataset was transformed
 }
 
@@ -35,7 +35,7 @@ def convert(raw_dir, max_features):
 
     # We remove features 0 (timestamp), 16-19, 33-36 and 50-53 (invalid).
     columns = range(1, 16) + range(20, 33) + range(37, 50)
-    return util.convert_uci_classif(info, data_dir, file_name_list, delimiter=" ", y_first=True, usecols=columns)
+    return util.convert_uci_classif(info, data_dir, file_name_list, stride=4, delimiter=" ", y_first=True, usecols=columns)
 
 
 info["description"] = """

@@ -28,7 +28,7 @@ def fetch(raw_dir):  # takes care of fetching all required files into raw_dir
     
 
 def convert(raw_dir, max_features):
-    return util.convert_uci_classif(info, raw_dir, file_name)
+    return util.convert_uci_classif(info, raw_dir, file_name, stride=4)
 
 
 info["description"] = """
