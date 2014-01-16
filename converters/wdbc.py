@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
-Created on Dec 1, 2013
+Created on Jan 15, 2014
 
-@author: alexandre
+@author: pascal
 '''
 
 

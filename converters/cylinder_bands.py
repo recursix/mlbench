@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+'''
+Created on Jan 15, 2014
+
+@author: pascal
+'''
 
 from mlbench import util
 from os import path

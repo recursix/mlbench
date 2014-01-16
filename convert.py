@@ -107,6 +107,7 @@ if __name__ == "__main__":
         'covtype',
         'cylinder_bands',
         'ml_prove',
+        'mushroom',
         'optdigits',
         'ozone',
         'spambase',
