@@ -31,20 +31,27 @@ def read_pklz( *file_path ):
         data = fd.read() 
     return cPickle.loads(zlib.decompress( data ))
 
-def save_dataset( dataset, ds_dir ):
+def save_dataset( dataset, collection_dir,  non_info_fields = ('x','y') ):
+    dataset_dict = dataset.__dict__
+    ds_dir = path.join( collection_dir, dataset.key )
     if not path.exists(ds_dir): os.makedirs( ds_dir )
     
-    ds_info = {'n_samples':dataset['x'].shape[0]}
-    for key in dataset.iterkeys():
-        if key in ['x','y']: continue
-        ds_info[key]  = dataset[key]
+    dataset_info = {'n_samples':dataset_dict['x'].shape[0]}
+    for key in dataset_dict.iterkeys():
+        if key in non_info_fields: continue
+        dataset_info[key]  = dataset_dict[key]
         
-    write_json(ds_info, ds_dir, 'dataset_info.json' )
-    write_pklz(dataset, ds_dir, 'dataset.pklz' ) 
+    write_json(dataset_info, ds_dir, 'dataset_info.json' )
+    write_pklz(dataset_dict, ds_dir, 'dataset.pklz' ) 
     
 def convert_missing( dataset ):
     for i, col in enumerate( dataset.x.T ):
         missing = np.isnan( col )
+        
+        if missing.all():
+            dataset.x[:,i] = 0 # there is not much to do
+            continue
+        
         valid = col[~missing]
         if np.any( missing ):
             
@@ -61,39 +68,51 @@ def convert_missing( dataset ):
                 default_val = np.mean(valid)  
                 dataset.x[missing,i] = default_val
  
- 
-def convert( dataset_key_list, collection_dir=None ):
+def fetch_and_convert(dataset_key, tmp_dir = '/tmp/mlbench'):
+    
+    print 'Converting %s.'%dataset_key
+        
+    module = import_module("converters.%s"%dataset_key)
+    
+    raw_dir = path.join(tmp_dir, dataset_key)
+    if not path.exists(raw_dir): os.makedirs(raw_dir)
+    
+    print 'fetch dataset'
+    module.fetch(raw_dir)
+    
+    print 'converting dataset'
+    dataset_dict = module.convert(raw_dir, 500)
+    assert dataset_key == dataset_dict['key']
+
+    return util.DictToObj( dataset_dict ) # much easier to work with
+
+
+def analyze_dataset( dataset ):
+    
+    util.check_fields(dataset.__dict__)
+
+    print 'x.shape = ', dataset.x.shape
+    print 'y.shape = ', dataset.y.shape
+
+    for i, col in enumerate( dataset.x.T ):
+        print uHist(col, 'col %d (%s)'%(i,dataset.x_type[i]))
+        if len(np.unique(col)) == 1:
+            print '***WARNING*** This feature is useless, it takes only one value'
+    
+    print uHist( dataset.y, 'y' )
+    
+    print
+    
+    
+    
+
+def convert_all( dataset_key_list, collection_dir, tmp_dir = '/tmp/mlbench'):
     for dataset_key in dataset_key_list:
+        dataset = fetch_and_convert(dataset_key, tmp_dir)
+        convert_missing( dataset )
+        analyze_dataset( dataset )
+        save_dataset(dataset, collection_dir ) 
         
-        print 'Converting %s.'%dataset_key
-        
-        module = import_module("converters.%s"%dataset_key)
-        
-        raw_dir = path.join('/tmp/mlbench', dataset_key)
-        if not path.exists(raw_dir): os.makedirs(raw_dir)
-        
-        print 'fetch dataset'
-        module.fetch(raw_dir)
-        
-        print 'converting dataset'
-        dataset_dict = module.convert(raw_dir, 500)
-        util.check_dict(dataset_dict)
-        dataset = util.DictToObj( dataset_dict ) # much easier to work with
-
-        
-        print 'x.shape = ', dataset.x.shape
-        print 'y.shape = ', dataset.y.shape
-
-        for i, col in enumerate( dataset.x.T ):
-            print uHist(col, 'col %d (%s)'%(i,dataset.x_type[i]))
-        
-        print uHist( dataset.y, 'y' )
-        print
-        
-        if collection_dir is not None:
-            ds_dir =path.join( collection_dir, dataset_key)
-            save_dataset(dataset_dict, ds_dir ) 
-            
             
 
 
@@ -125,6 +144,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 2:
         collection_dir = sys.argv[2]
     
-    convert(dataset_list, collection_dir)
+    convert_all(dataset_list, collection_dir)
     
     
