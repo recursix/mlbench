@@ -110,6 +110,7 @@ if __name__ == "__main__":
         'mushroom',
         'optdigits',
         'ozone',
+        'pamap2',
         'spambase',
         'statlog_satimage',
         'wall-robot',
