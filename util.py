@@ -199,14 +199,12 @@ def converter(x_type, y_type, path_list, delimiter=",", y_first=False, **kwargs)
             print 
         type_list[i] = type_
 
-
-        col_ = col.copy() # modifying col would modify str_mat
-        col_[ col == '?' ] = 'NaN'
+        col[ col == '?' ] = 'NaN'
         if type_ == 'enum':
-            enum_map = build_enum_map(col_)
-            xy[:,i] = map(enum_map.get, col_ )
+            enum_map = build_enum_map(col)
+            xy[:,i] = map(enum_map.get, col)
         elif type_ in ['float', 'int']:
-            xy[:,i] = col_.astype(np.float)
+            xy[:,i] = col.astype(np.float)
         else:
             raise ValueError('Unkown type : %s'%type_)
 
