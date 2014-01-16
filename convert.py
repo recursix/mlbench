@@ -106,6 +106,7 @@ if __name__ == "__main__":
         'connect_4',
         'covtype',
         'cylinder_bands',
+        'kddcup99',
         'ml_prove',
         'mushroom',
         'optdigits',
