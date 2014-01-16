@@ -37,11 +37,9 @@ class DictToObj:
     def __init__(self, dict_):
         self.__dict__ = dict_
 
-def check_dict(d):
+def check_fields(d):
     for attr in mandatory_fields:
-        val = d[attr]
-#    for key in ['x','y']:
-#        print uHist( d[key],key)
+        assert attr in d
 
 def split_xy(xy, y_first=False):
     """
@@ -213,13 +211,16 @@ def build_enum_map(col_str):
     to each of these classes.
     """
     
-    values = np.unique(col_str)
-
+    missing = col_str == 'NaN'
+    values = np.unique(col_str[~missing])
+    
     if len(values) > len(col_str) / 2.:
         warn("Unusually high amount of classes, probably not an enum.")
         
     classes = np.arange(len(values))
-    return dict( zip( values, classes ))
+    enum_map =  dict( zip( values, classes ))
+    if any(missing): enum_map['NaN']  = np.NAN # At this stage, we still convert 'NaN' to nan instead of a particular class
+    return enum_map
 
 def load_file(name,**kwargs):
     a = np.loadtxt(name, dtype=np.str, **kwargs)

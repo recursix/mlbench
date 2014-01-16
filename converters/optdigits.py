@@ -24,8 +24,7 @@ info = {
 src_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/optdigits/" 
 file_name_list= ['optdigits.tes', 'optdigits.tra' ]
 def fetch(raw_dir): # takes care of fetching all required files into raw_dir
-    for file_name in file_name_list:
-        util.fetch(raw_dir, src_url, file_name)
+    util.fetch(raw_dir, src_url, *file_name_list)
 
 
 def convert(raw_dir, max_features):
