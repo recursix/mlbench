@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
 Created on Dec 2, 2013
@@ -106,58 +107,55 @@ def analyze_dataset( dataset, min_features = 20, max_features=500 ):
     
     print
     
-def subsample( dataset, max_samples=10000 ):
+def shuffle_and_subsample( dataset, max_samples=10000 ):
     m = dataset.x.shape[0]
+    
+    idx = np.arange(m)
+    np.random.shuffle(idx)
     if m > max_samples:
         print 'sub sampling x from %d to %d.'%(m, max_samples)
-        idx = np.arange(m)
-        np.random.shuffle(idx)
         idx = idx[:max_samples] # shuffle instead of subsampling to void duplicate samples
         
-        dataset.x = dataset.x[idx,:]
-        dataset.y = dataset.y[idx]
+    dataset.x = dataset.x[idx,:]
+    dataset.y = dataset.y[idx]
     
 
-def convert_all( dataset_key_list, collection_dir, tmp_dir = '/tmp/mlbench', max_samples= 10000):
+def convert_all( dataset_key_list, collections_dir, max_samples= 10000):
+    collection_dir = path.join(collections_dir,'classification')
+    src_dir = path.join(collections_dir,'classification_src')
     for dataset_key in dataset_key_list:
         try:
-            dataset = fetch_and_convert(dataset_key, tmp_dir)
+            dataset = fetch_and_convert(dataset_key, src_dir)
             convert_missing( dataset )
-            subsample( dataset, max_samples)
+            shuffle_and_subsample( dataset, max_samples)
             analyze_dataset( dataset )
             save_dataset( dataset, collection_dir )
             
-        except: pass
+        except KeyboardInterrupt:
+            print 'Cancelling convert'
+            break 
         
-
-if __name__ == "__main__":
-    dataset_list = [
-        'annealing',
-        'biodeg',
-        'census-income',
-        'chess_KRKPA7',
-        'connect_4',
-        'covtype',
-        'cylinder_bands',
-        'kddcup99',
-        'ml_prove',
-        'mushroom',
-        'optdigits',
-        'ozone',
-        'pamap2',
-        'spambase',
-        'statlog_satimage',
-        'wall-robot',
-        'wdbc'
-        ]
+        
+def get_dataset_keys():
+    converters_dir = path.join( path.dirname(__file__), 'converters' )
+    dataset_key_list = []
+    for file_name in os.listdir(converters_dir):
+        if file_name.startswith('_'): continue 
+        key, ext = path.splitext(file_name)
+        if ext == '.py': dataset_key_list.append( key )
+    return dataset_key_list
     
-    collection_dir = path.expandvars( "$HOME/data/dataset_collection/classification" )
+if __name__ == "__main__":
+    collection_dir = path.expandvars( "$HOME/data/dataset_collection" )
 
     if len(sys.argv) > 1:
-        dataset_list = sys.argv[1].split(',')
+        dataset_key_list = sys.argv[1].split(',')
+    else:
+        dataset_key_list = get_dataset_keys()
+
     if len(sys.argv) > 2:
         collection_dir = sys.argv[2]
     
-    convert_all(dataset_list, collection_dir)
+    convert_all(dataset_key_list, collection_dir)
     
     
