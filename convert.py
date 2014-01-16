@@ -14,7 +14,7 @@ import cPickle
 import zlib
 import sys
 
-
+import numpy as np
         
 
 def write_json( data, *file_path ):
@@ -43,9 +43,24 @@ def save_dataset( dataset, ds_dir ):
     write_pklz(dataset, ds_dir, 'dataset.pklz' ) 
     
 def convert_missing( dataset ):
-    for col, type_ in enumerate( dataset['x'].T ):
-        pass
-    pass  
+    for i, col in enumerate( dataset.x.T ):
+        missing = np.isnan( col )
+        valid = col[~missing]
+        if np.any( missing ):
+            
+            type_ = dataset.x_type[i]
+            if type_ == 'enum':
+                default_val = np.max(valid) +1 # creating a new class
+                dataset.x[missing,i] = default_val
+    
+            elif type_ == 'int':
+                default_val = np.round( np.mean(valid) ) 
+                dataset.x[missing,i] = default_val
+                
+            elif type_ == 'float':
+                default_val = np.mean(valid)  
+                dataset.x[missing,i] = default_val
+ 
  
 def convert( dataset_key_list, collection_dir=None ):
     for dataset_key in dataset_key_list:
