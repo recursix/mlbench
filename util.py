@@ -197,7 +197,7 @@ def converter(x_type, y_type, path_list, delimiter=",", y_first=False, **kwargs)
         type_list[i] = type_
 
 
-        col_ = col.copy()
+        col_ = col.copy() # modifying col would modify str_mat
         col_[ col == '?' ] = 'NaN'
         if type_ == 'enum':
             enum_map = build_enum_map(col_)
