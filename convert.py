@@ -114,11 +114,13 @@ if __name__ == "__main__":
         'covtype',
         'cylinder_bands',
         'ml_prove',
+        'mushroom',
         'optdigits',
         'ozone',
         'spambase',
         'statlog_satimage',
-        'wall-robot'
+        'wall-robot',
+        'wdbc'
         ]
     
     collection_dir = path.expandvars( "$HOME/data/dataset_collection/classification" )
