@@ -134,6 +134,9 @@ def uncompress(raw_dir, src, dst ):
 def untar( raw_dir, src ):
     sp.check_call(['tar', '-xf',  src ], cwd=raw_dir)
 
+def unzip(raw_dir, src):
+    sp.check_call(['unzip', '-o', src], cwd=raw_dir)
+
 def convert_uci_classif( info, raw_dir, file_name_list, delimiter=",", y_first=False, **kwargs ):
     """
     Some form of universal UCI converter. 
@@ -205,7 +208,13 @@ def converter(x_type, y_type, path_list, delimiter=",", y_first=False, **kwargs)
             xy[:,i] = col_.astype(np.float)
         else:
             raise ValueError('Unkown type : %s'%type_)
-    return xy, type_list[:-1]
+
+    if y_first:
+        type_list = type_list[1:]
+    else:
+        type_list = type_list[:-1]
+
+    return xy, type_list
 
 def build_enum_map(col_str):
     """
