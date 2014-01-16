@@ -127,9 +127,12 @@ def fetch( raw_dir, url_folder, *file_name_list ):
     for file_name in file_name_list:
         wget( '%s/%s'%(url_folder, file_name), raw_dir )
 
-def uncompress(raw_dir, src, dst ):
+def uncompress(raw_dir, src, dst=None):
+    if dst is None:
+        dst = src.split(".gz")[0]
+
     with open( path.join(raw_dir,dst),'w') as fd:
-        sp.check_call(['gunzip', '-c', src ], cwd =raw_dir, stdout= fd )
+        sp.check_call(['gunzip', '-c', src ], cwd=raw_dir, stdout= fd )
 
 def untar( raw_dir, src ):
     sp.check_call(['tar', '-xf',  src ], cwd=raw_dir)
