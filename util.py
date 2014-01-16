@@ -43,8 +43,14 @@ def check_dict(d):
 #    for key in ['x','y']:
 #        print uHist( d[key],key)
 
-def split_xy(xy):
-    return xy[:,:-1], xy[:,-1]
+def split_xy(xy, y_first=False):
+    """
+    y_first: True => first column contains labels; False => last column contains labels.
+    """
+    if y_first:
+        return xy[:,1:], xy[:,0]
+    else:
+        return xy[:,:-1], xy[:,-1]
 
 def convert_value(str_val):
     """
@@ -128,7 +134,7 @@ def uncompress(raw_dir, src, dst ):
 def untar( raw_dir, src ):
     sp.check_call(['tar', '-xf',  src ], cwd=raw_dir)
 
-def convert_uci_classif( info, raw_dir, file_name_list, delimiter=",", **kwargs ):
+def convert_uci_classif( info, raw_dir, file_name_list, delimiter=",", y_first=False, **kwargs ):
     """
     Some form of universal UCI converter. 
     """
@@ -138,8 +144,8 @@ def convert_uci_classif( info, raw_dir, file_name_list, delimiter=",", **kwargs 
     
     path_list = [ path.join( raw_dir, file_name ) for file_name in file_name_list ]
     
-    xy, info['x_type'] = converter(info['x_type'], info['y_type'], path_list, delimiter=delimiter, **kwargs ) 
-    info['x'], info['y'] = split_xy(xy)
+    xy, info['x_type'] = converter(info['x_type'], info['y_type'], path_list, delimiter=delimiter, y_first=y_first, **kwargs ) 
+    info['x'], info['y'] = split_xy(xy, y_first)
     return info
     
 def choose_type( type_, inferred_type, col ):
@@ -153,7 +159,10 @@ def choose_type( type_, inferred_type, col ):
 
     return type_
 
-def converter(x_type, y_type, path_list, delimiter=",", **kwargs):
+def converter(x_type, y_type, path_list, delimiter=",", y_first=False, **kwargs):
+    """
+    y_first: True => first column contains labels; False => last column contains labels.
+    """
     str_mat_list = []
     for file_path in path_list:
         str_mat_list.append(  np.loadtxt(file_path, dtype=np.str,delimiter=delimiter,**kwargs) )
@@ -168,7 +177,11 @@ def converter(x_type, y_type, path_list, delimiter=",", **kwargs):
         x_type = list(x_type)
     
     type_list = x_type[:] # copy 
-    type_list.append(y_type)
+    
+    if y_first:
+        type_list.insert(0, y_type)
+    else:
+        type_list.append(y_type)
 
     assert str_mat.shape[1] == len(type_list),  'num col = %d, num type = %d'%( str_mat.shape[1] , len(type_list) )
     

@@ -96,7 +96,8 @@ if __name__ == "__main__":
         'ozone',
         'spambase',
         'statlog_satimage',
-        'wall-robot'
+        'wall-robot',
+        'wdbc'
         ]
     
     collection_dir = path.expandvars( "$HOME/data/dataset_collection/classification" )
