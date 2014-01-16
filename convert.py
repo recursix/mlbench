@@ -87,34 +87,48 @@ def fetch_and_convert(dataset_key, tmp_dir = '/tmp/mlbench'):
     return util.DictToObj( dataset_dict ) # much easier to work with
 
 
-def analyze_dataset( dataset ):
+def analyze_dataset( dataset, min_features = 20, max_features=500 ):
+    
     
     util.check_fields(dataset.__dict__)
-
-    print 'x.shape = ', dataset.x.shape
-    print 'y.shape = ', dataset.y.shape
-
+    
     for i, col in enumerate( dataset.x.T ):
         print uHist(col, 'col %d (%s)'%(i,dataset.x_type[i]))
         if len(np.unique(col)) == 1:
-            print '***WARNING*** This feature is useless, it takes only one value'
+            print '***WARNING*** Feature %d is constant across the whole dataset.'%(i)
     
     print uHist( dataset.y, 'y' )
     
+    n_features = dataset.x.shape[1]
+    assert n_features >= min_features, "Dataset %s is having %d < %d features"%(dataset.key, n_features, min_features)
+    assert n_features <= max_features, "Dataset %s is having %d > %d features"%(dataset.key, n_features, max_features)
+    
+    
     print
     
-    
-    
-
-def convert_all( dataset_key_list, collection_dir, tmp_dir = '/tmp/mlbench'):
-    for dataset_key in dataset_key_list:
-        dataset = fetch_and_convert(dataset_key, tmp_dir)
-        convert_missing( dataset )
-        analyze_dataset( dataset )
-        save_dataset(dataset, collection_dir ) 
+def subsample( dataset, max_samples=10000 ):
+    m = dataset.x.shape[0]
+    if m > max_samples:
+        print 'sub sampling x from %d to %d.'%(m, max_samples)
+        idx = np.arange(m)
+        np.random.shuffle(idx)
+        idx = idx[:max_samples] # shuffle instead of subsampling to void duplicate samples
         
-            
+        dataset.x = dataset.x[idx,:]
+        dataset.y = dataset.y[idx]
+    
 
+def convert_all( dataset_key_list, collection_dir, tmp_dir = '/tmp/mlbench', max_samples= 10000):
+    for dataset_key in dataset_key_list:
+        try:
+            dataset = fetch_and_convert(dataset_key, tmp_dir)
+            convert_missing( dataset )
+            subsample( dataset, max_samples)
+            analyze_dataset( dataset )
+            save_dataset( dataset, collection_dir )
+            
+        except: pass
+        
 
 if __name__ == "__main__":
     dataset_list = [
