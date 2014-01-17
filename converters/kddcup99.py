@@ -9,7 +9,8 @@ Created on Jan 16, 2014
 
 #from graalUtil.num import uHist
 from mlbench import util
-import os
+import gzip
+from os import path
 
 info = {
     "url" : "http://archive.ics.uci.edu/ml/datasets/KDD+Cup+1999+Data",
@@ -28,7 +29,16 @@ def fetch(raw_dir):  # takes care of fetching all required files into raw_dir
     
 
 def convert(raw_dir, max_features):
-    return util.convert_uci_classif(info, raw_dir, file_name, stride=4)
+    
+    # extract only one line out of 10 since the dataset fails to load in memory (using numpy.loadtxt with str data type)
+    file_name_ = "kddcup_sub.data"
+    with gzip.open( path.join(raw_dir, file_name ), 'r') as fd_read:
+        with open(  path.join(raw_dir, file_name_), 'w') as fd_write:
+            for i,line in enumerate(fd_read): 
+                if i%10 == 0:
+                    fd_write.write( line )
+    
+    return util.convert_uci_classif(info, raw_dir, file_name_)
 
 
 info["description"] = """
