@@ -11,7 +11,7 @@ from mlbench import util
 info = {
     "url" : "http://archive.ics.uci.edu/ml/datasets/Wall-Following+Robot+Navigation+Data",
     "name": "Wall-Following Robot Navigation Data",
-    "key": "wall-robot",
+    "key": "wall_robot",
     "y_type": "enum",  # the type of the y space. (will be enum for now)
     "x_type": None,  # If None, it will be inferred from the content of the column
     "preprocessing": 'Only take the first dataset, which contains the raw values of measurements.',  # briefly describes how the original dataset was transformed

@@ -7,6 +7,7 @@ Created on Jan 15, 2014
 
 
 from mlbench import util
+import numpy as np
 
 info = {
     "url" : "http://archive.ics.uci.edu/ml/datasets/Mushroom", # url of a web page for the dataset
@@ -23,12 +24,13 @@ def fetch(raw_dir): # takes care of fetching all required files into raw_dir
     util.fetch(raw_dir, src_url, file_name)
     
 
-
 def convert(raw_dir, max_features):
-    """
-    returns a dictionary containing the required fields for the dataset.
-    """
-    return util.convert_uci_classif( info, raw_dir, file_name, y_first=True )
+    dataset_dict =  util.convert_uci_classif( info, raw_dir, file_name, y_first=True )
+    
+    # Feature 15 is constant. Thus useless.
+    # Feature 4 is the most important feature (according to random forest). 
+    # But with it, the problem is too easy i.e., most decent learning algorithms classify the test perfectly.
+    return util.remove_features( dataset_dict, [4,15] ) 
     
 
 info["description"]= """

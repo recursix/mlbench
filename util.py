@@ -118,6 +118,15 @@ def infer_column_type( str_list, verbose ):
          
     return tuple(type_list)
 
+
+def remove_features( dataset_dict, features ):
+    x = dataset_dict['x']
+    mask = np.ones( x.shape[1], dtype=np.bool )
+    mask[features] = False
+    dataset_dict['x']= x[:,mask]
+    
+    return dataset_dict
+        
 def wget(url, raw_dir):
     sp.check_call(['wget', '-N', url, '-P',raw_dir])
 
